@@ -1,4 +1,3 @@
-# app.py - VERSÃO COM SINTAXE CORRIGIDA
 import sqlite3
 import os
 from flask import Flask, jsonify, request, session, render_template
