@@ -1,7 +1,5 @@
-# database.py - VERSÃO FINAL E REVISADA
 import sqlite3
 
-# Conecta ao banco de dados (cria o arquivo se não existir)
 conn = sqlite3.connect('database.db')
 cursor = conn.cursor()
 
