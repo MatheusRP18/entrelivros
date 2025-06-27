@@ -14,7 +14,7 @@ Bem-vindo ao **EntreLivros**! Este projeto nasceu da ideia de criar uma forma si
 
 *Tire um print da sua aplicação funcionando e coloque aqui! Isso faz toda a diferença. Para fazer isso, coloque a imagem na pasta `static` e use o caminho: `![Demonstração](static/nome_da_sua_imagem.png)`*
 
-![Placeholder para a imagem da aplicação](https://i.imgur.com/lEGr84I.png)
+![Placeholder para a imagem da aplicação](https://i.imgur.com/RfbcJoP.png)
 
 ---
 
@@ -102,7 +102,3 @@ Algumas ideias para evoluir o projeto:
 
 ---
 
-Feito com ❤️ por **[Seu Nome Aqui]**.
-
-[![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/[seu-linkedin]/)
-[![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/[SeuUsuario])
