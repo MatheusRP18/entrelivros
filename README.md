@@ -12,8 +12,6 @@ Bem-vindo ao **EntreLivros**! Este projeto nasceu da ideia de criar uma forma si
 
 ### 🖼️ Demonstração Visual
 
-*Tire um print da sua aplicação funcionando e coloque aqui! Isso faz toda a diferença. Para fazer isso, coloque a imagem na pasta `static` e use o caminho: `![Demonstração](static/nome_da_sua_imagem.png)`*
-
 ![Placeholder para a imagem da aplicação](https://i.imgur.com/RfbcJoP.png)
 
 ---
