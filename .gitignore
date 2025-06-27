@@ -1,0 +1,17 @@
+# Pastas de ambiente virtual
+venv/
+.venv/
+env/
+
+# Arquivos do PyCharm
+.idea/
+
+# Arquivos compilados do Python
+__pycache__/
+*.pyc
+
+# Banco de dados
+database.db
+
+# Arquivos de sistema
+.DS_Store

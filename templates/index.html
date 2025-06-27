@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EntreLivros - Empréstimo de Livros</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5D4037;   /* Marrom Café */
+            --secondary: #C89B3C; /* Dourado Envelhecido */
+            --accent: #8D2B2B;    /* Vinho Tinto */
+            --light: #FDF8E1;    /* Branco Pergaminho */
+            --dark: #3C3633;      /* Cinza Escuro */
+        }
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-link.active { color: white; border-bottom: 2px solid var(--secondary); }
+    </style>
+</head>
+<body class="bg-[var(--light)] min-h-screen">
+    <header class="bg-[var(--primary)] text-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div id="logo-container" class="flex items-center space-x-2 cursor-pointer">
+                    <img src="/static/logo.png" alt="Logo EntreLivros" class="h-12">
+                </div>
+                <!-- Navegação Desktop -->
+                <nav class="hidden md:flex space-x-6 items-center">
+                    <a href="#home" class="nav-link hover:text-gray-200 transition px-2 py-2">Início</a>
+                    <a href="#loans-dashboard" class="nav-link hover:text-gray-200 transition px-2 py-2 hidden" id="loans-dashboard-link">Painel</a>
+                    <a href="#add-book" class="nav-link hover:text-gray-200 transition px-2 py-2 hidden" id="add-book-link">Adicionar Livro</a>
+                    <a href="#my-books" class="nav-link hover:text-gray-200 transition px-2 py-2 hidden" id="my-books-link">Meus Livros</a>
+                    <button id="login-btn" class="bg-white text-[var(--primary)] px-4 py-1 rounded-lg hover:bg-gray-200 transition">Login</button>
+                    <div id="user-info" class="hidden items-center space-x-4">
+                        <a href="#loans-dashboard" id="notification-bell" class="relative hover:text-gray-200 transition">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="notification-badge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </a>
+                        <i class="fas fa-user-circle text-xl"></i>
+                        <span id="username-display"></span>
+                        <button id="logout-btn" class="hover:text-gray-200">(Sair)</button>
+                    </div>
+                </nav>
+                <!-- Área Mobile (Direita do Header) -->
+                <div class="md:hidden flex items-center space-x-4">
+                    <div id="mobile-user-header" class="hidden items-center space-x-3 text-white">
+                        <a href="#loans-dashboard" id="mobile-notification-bell" class="relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="mobile-notification-badge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"></span>
+                        </a>
+                        <span id="mobile-username-header-display" class="font-semibold"></span>
+                        <!-- Botão de Sair Mobile Adicionado -->
+                        <button id="mobile-logout-btn" class="hover:text-gray-200 text-sm">(Sair)</button>
+                    </div>
+                    <button class="text-xl" id="mobile-menu-button"> <i class="fas fa-bars"></i> </button>
+                </div>
+            </div>
+        </div>
+        <!-- Menu Mobile (Slider) -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="nav-link-mobile text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Início</a>
+                <a href="#loans-dashboard" id="mobile-loans-dashboard-link" class="nav-link-mobile text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium hidden">Painel</a>
+                <a href="#add-book" id="mobile-add-book-link" class="nav-link-mobile text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium hidden">Adicionar Livro</a>
+                <a href="#my-books" id="mobile-my-books-link" class="nav-link-mobile text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium hidden">Meus Livros</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <section id="home" class="page-section">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 md:p-10 text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Sua estante, conectada.</h2>
+                <p class="text-gray-600 mb-6 max-w-2xl mx-auto">Descubra os livros que seus amigos têm e compartilhe suas próprias histórias. EntreLivros organiza os empréstimos para que ótimas leituras nunca fiquem paradas.</p>
+                <div id="hero-login-container">
+                    <button id="hero-login-btn" class="bg-[var(--primary)] hover:bg-[var(--dark)] text-white font-medium py-2 px-6 rounded-lg transition">Faça login para começar</button>
+                </div>
+            </div>
+            <div id="book-list" class="relative">
+                <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                    <h2 class="text-2xl font-bold text-[var(--dark)] flex items-center"> <i class="fas fa-book mr-2 text-[var(--primary)]"></i> Livros na Comunidade </h2>
+                    <div class="flex flex-col sm:flex-row items-center gap-4">
+                        <div class="relative">
+                            <input type="search" id="search-bar" placeholder="Buscar por Título ou Autor..." class="w-full sm:w-64 appearance-none bg-white border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[var(--primary)]">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fas fa-search"></i></div>
+                        </div>
+                        <div class="relative"><select id="category-filter" class="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-[var(--primary)]"></select><div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"><i class="fas fa-chevron-down"></i></div></div>
+                        <div class="relative"><select id="filter" class="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-[var(--primary)]"><option value="all">Todos</option><option value="available">Disponíveis</option><option value="unavailable">Emprestados</option></select><div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"><i class="fas fa-chevron-down"></i></div></div>
+                    </div>
+                </div>
+                <div id="loading-spinner" class="hidden absolute inset-0 bg-gray-50 bg-opacity-75 flex items-center justify-center z-20" style="min-height: 20rem;"><i class="fas fa-spinner fa-spin text-4xl text-[var(--primary)]"></i></div>
+                <div id="books-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            </div>
+        </section>
+
+        <section id="loans-dashboard" class="page-section hidden">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Painel de Empréstimos</h2>
+            <div id="dashboard-content">
+                <div class="mb-12"><h3 class="text-2xl font-semibold text-[var(--dark)] mb-4 border-b-2 border-[var(--secondary)] pb-2">Meus Pedidos de Empréstimo</h3><div id="my-requests-container" class="space-y-4"></div></div>
+                <div><h3 class="text-2xl font-semibold text-[var(--dark)] mb-4 border-b-2 border-[var(--secondary)] pb-2">Pedidos Recebidos para Meus Livros</h3><div id="received-requests-container" class="space-y-4"></div></div>
+            </div>
+        </section>
+
+        <section id="add-book" class="page-section hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 max-w-2xl mx-auto">
+                <h2 id="form-title" class="text-2xl font-bold text-[var(--dark)] mb-6 flex items-center"></h2>
+                <form id="book-form" class="space-y-4">
+                    <input type="hidden" id="book-id" name="book_id">
+                    <div><label for="title" class="block text-gray-700 font-medium mb-2">Título</label><input type="text" id="title" name="title" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></div>
+                    <div><label for="author" class="block text-gray-700 font-medium mb-2">Autor</label><input type="text" id="author" name="author" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></div>
+                    <div><label for="category" class="block text-gray-700 font-medium mb-2">Categoria</label><select id="category" name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></select></div>
+                    <div><label for="description" class="block text-gray-700 font-medium mb-2">Descrição</label><textarea id="description" name="description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea></div>
+                    <div><label for="cover" class="block text-gray-700 font-medium mb-2">Capa do Livro (opcional)</label><input type="file" id="cover" name="cover" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg"> <p class="text-xs text-gray-500 mt-1">Se não enviar uma nova, a capa atual será mantida.</p> </div>
+                    <button type="submit" class="bg-[var(--primary)] hover:bg-[var(--dark)] text-white font-medium py-2 px-6 rounded-lg transition">Salvar Livro</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="my-books" class="page-section hidden">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Meus Livros</h2>
+            <div id="my-books-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="user-profile" class="page-section hidden">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6" id="profile-title"></h2>
+            <div id="profile-books-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+        </section>
+    </main>
+
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"><div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 fade-in"><div class="p-6"><div class="flex justify-between items-start mb-4"><div class="flex space-x-4"><button id="login-tab" class="text-xl font-bold text-[var(--primary)] border-b-2 border-[var(--primary)] pb-1">Login</button><button id="register-tab" class="text-xl font-bold text-gray-500 pb-1">Registrar</button></div><button id="close-login-modal" class="text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button></div><form id="login-form" class="space-y-4"><div><label for="username" class="block text-gray-700 font-medium mb-2">Nome de Usuário</label><input type="text" id="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></div><div><label for="password" class="block text-gray-700 font-medium mb-2">Senha</label><input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></div><button type="submit" class="bg-[var(--primary)] hover:bg-[var(--dark)] text-white font-medium py-2 px-6 rounded-lg transition w-full">Entrar</button></form><form id="register-form" class="space-y-4 hidden"><div><label for="reg-username" class="block text-gray-700 font-medium mb-2">Nome de Usuário</label><input type="text" id="reg-username" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></div><div><label for="reg-password" class="block text-gray-700 font-medium mb-2">Senha</label><input type="password" id="reg-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></div><div><label for="reg-confirm-password" class="block text-gray-700 font-medium mb-2">Confirmar Senha</label><input type="password" id="reg-confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></div><button type="submit" class="bg-[var(--secondary)] hover:bg-[var(--dark)] text-white font-medium py-2 px-6 rounded-lg transition w-full">Registrar</button></form></div></div></div>
+    <div id="book-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"><div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 fade-in"><div class="p-6"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-bold text-gray-800" id="modal-title"></h3><button id="close-modal" class="text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button></div><div id="modal-content" class="space-y-4"></div><div id="loan-form-container" class="hidden border-t pt-4 mt-4"><p class="font-medium text-gray-700 mb-2">Selecione o período do empréstimo:</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label for="start-date" class="block text-sm font-medium text-gray-600">De</label><input type="date" id="start-date" name="start-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></div><div><label for="end-date" class="block text-sm font-medium text-gray-600">Até</label><input type="date" id="end-date" name="end-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></div></div><button id="confirm-request-btn" class="mt-4 bg-[var(--secondary)] hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg w-full">Confirmar Solicitação</button></div></div></div></div>
+    <div id="success-toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 transform translate-y-24 transition-transform duration-300 z-50"><i class="fas fa-check-circle text-xl"></i><span id="toast-message"></span></div>
+    <footer class="bg-[var(--dark)] text-white py-8 mt-12"><div class="container mx-auto px-4 text-center"><p>&copy; 2025 EntreLivros. Todos os direitos reservados.</p></div></footer>
+
+    <script>
+    // --- CONSTANTES E VARIÁVEIS GLOBAIS ---
+    const API_URL = '/api';
+    const BASE_URL = '';
+    const bookCategories = ['Ficção', 'Não-Ficção', 'Romance', 'Suspense', 'Fantasia', 'Biografia', 'Infantojuvenil', 'Técnico', 'Outro'];
+    let currentUser = null;
+    let books = [];
+    let loans = { my_requests: [], received_requests: [] };
+
+    // --- DOM ELEMENTS ---
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileUserHeader = document.getElementById('mobile-user-header');
+    const mobileNotificationBell = document.getElementById('mobile-notification-bell');
+    const mobileNotificationBadge = document.getElementById('mobile-notification-badge');
+    const mobileUsernameHeaderDisplay = document.getElementById('mobile-username-header-display');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+    const booksContainer = document.getElementById('books-container');
+    const myBooksContainer = document.getElementById('my-books-container');
+    const filterSelect = document.getElementById('filter');
+    const categoryFilterSelect = document.getElementById('category-filter');
+    const searchBar = document.getElementById('search-bar');
+    const bookModal = document.getElementById('book-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const loginModal = document.getElementById('login-modal');
+    const closeLoginModal = document.getElementById('close-login-modal');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const bookForm = document.getElementById('book-form');
+    const loginBtn = document.getElementById('login-btn');
+    const heroLoginBtn = document.getElementById('hero-login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const loginTab = document.getElementById('login-tab');
+    const registerTab = document.getElementById('register-tab');
+    const logoContainer = document.getElementById('logo-container');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const notificationBadge = document.getElementById('notification-badge');
+    const notificationBell = document.getElementById('notification-bell');
+
+    // --- FUNÇÕES ---
+
+    function debounce(func, timeout = 300){
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+
+    function navigateTo(pageId) {
+        document.querySelectorAll('.page-section').forEach(section => section.classList.add('hidden'));
+        document.getElementById(pageId).classList.remove('hidden');
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+            if(link.getAttribute('href') === `#${pageId}`) {
+                link.classList.add('active');
+            }
+        });
+        window.scrollTo(0, 0);
+    }
+
+    function populateCategoryDropdowns() {
+        const categoryForm = document.getElementById('category');
+        categoryFilterSelect.innerHTML = '<option value="all">Todas as categorias</option>';
+        categoryForm.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
+        bookCategories.forEach(category => {
+            const optionHTML = `<option value="${category}">${category}</option>`;
+            categoryFilterSelect.innerHTML += optionHTML;
+            categoryForm.innerHTML += optionHTML;
+        });
+    }
+
+    async function apiFetch(endpoint, options = {}) {
+        options.credentials = 'include';
+        options.headers = { ...options.headers };
+        if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(options.body);
+        }
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, options);
+            const responseData = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                const message = responseData.message || `Erro: ${response.statusText}`;
+                showToast(message, 'error');
+                throw new Error(message);
+            }
+            return responseData;
+        } catch (error) {
+            showToast('Erro de conexão com o servidor.', 'error');
+            throw error;
+        }
+    }
+
+    function updateNotificationBadge(count) {
+        const badges = [notificationBadge, mobileNotificationBadge];
+        badges.forEach(badge => {
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        });
+    }
+
+    function updateUIForLoggedInUser() {
+        ['loans-dashboard-link', 'add-book-link', 'my-books-link', 'user-info', 'mobile-loans-dashboard-link', 'mobile-add-book-link', 'mobile-my-books-link', 'mobile-user-header'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden');
+        });
+        const heroLoginContainer = document.getElementById('hero-login-container');
+        if (heroLoginContainer) heroLoginContainer.style.display = 'none';
+        document.getElementById('login-btn').classList.add('hidden');
+        document.getElementById('username-display').textContent = currentUser;
+        document.getElementById('mobile-username-header-display').textContent = currentUser;
+    }
+
+    function updateUIForLoggedOutUser() {
+        ['loans-dashboard-link', 'add-book-link', 'my-books-link', 'user-info', 'mobile-loans-dashboard-link', 'mobile-add-book-link', 'mobile-my-books-link', 'mobile-user-header'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
+        const heroLoginContainer = document.getElementById('hero-login-container');
+        if (heroLoginContainer) heroLoginContainer.style.display = 'block';
+        document.getElementById('login-btn').classList.remove('hidden');
+        updateNotificationBadge(0);
+    }
+
+    async function checkLogin() {
+        try {
+            const data = await apiFetch('/session');
+            if (data.isLoggedIn) {
+                currentUser = data.username;
+                updateUIForLoggedInUser();
+                updateNotificationBadge(data.pending_notifications);
+            } else {
+                currentUser = null;
+                updateUIForLoggedOutUser();
+            }
+        } catch (error) { console.error("Erro ao verificar sessão:", error); updateUIForLoggedOutUser(); }
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        try {
+            await apiFetch('/login', { method: 'POST', body: { username: loginForm.username.value, password: loginForm.password.value } });
+            loginModal.classList.add('hidden');
+            loginForm.reset();
+            showToast('Login realizado com sucesso!');
+            await checkLogin();
+            await renderBooks();
+            navigateTo('home');
+        } catch (error) { console.error('Falha no login:', error); }
+    }
+
+    async function handleRegister(e) {
+        e.preventDefault();
+        const username = registerForm['reg-username'].value;
+        const password = registerForm['reg-password'].value;
+        const confirmPassword = registerForm['reg-confirm-password'].value;
+        if (password !== confirmPassword) { showToast('As senhas não coincidem', 'error'); return; }
+        try {
+            const data = await apiFetch('/register', { method: 'POST', body: { username, password } });
+            showToast(data.message);
+            switchTab('login');
+            registerForm.reset();
+        } catch (error) { console.error('Falha no registro:', error); }
+    }
+
+    async function logout() {
+        try {
+            await apiFetch('/logout', { method: 'POST' });
+            currentUser = null;
+            showToast('Você saiu da sua conta.');
+            await checkLogin();
+            await renderBooks();
+            navigateTo('home');
+        } catch (error) { console.error('Falha no logout:', error); }
+    }
+
+    function switchTab(tabName) {
+        if (tabName === 'login') {
+            loginTab.classList.add('text-[var(--primary)]', 'border-b-2', 'border-[var(--primary)]');
+            loginTab.classList.remove('text-gray-500');
+            registerTab.classList.remove('text-[var(--primary)]', 'border-b-2', 'border-[var(--primary)]');
+            registerTab.classList.add('text-gray-500');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+        } else {
+            registerTab.classList.add('text-[var(--primary)]', 'border-b-2', 'border-[var(--primary)]');
+            registerTab.classList.remove('text-gray-500');
+            loginTab.classList.remove('text-[var(--primary)]', 'border-b-2', 'border-[var(--primary)]');
+            loginTab.classList.add('text-gray-500');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        }
+    }
+
+    async function renderBooks() {
+        loadingSpinner.classList.remove('hidden');
+        booksContainer.innerHTML = '';
+        try {
+            const statusValue = filterSelect.value;
+            const categoryValue = categoryFilterSelect.value;
+            const searchValue = searchBar.value;
+            books = await apiFetch(`/books?filter=${statusValue}&category=${categoryValue}&search=${searchValue}`);
+            if (books.length === 0) {
+                booksContainer.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500"><i class="fas fa-book-open text-4xl mb-4"></i><p>Nenhum livro encontrado com esses filtros.</p></div>`;
+            } else {
+                books.forEach(book => booksContainer.appendChild(createBookCard(book)));
+            }
+        } catch (error) {
+            console.error("Erro ao carregar livros:", error);
+            booksContainer.innerHTML = `<div class="col-span-full text-center py-10 text-red-500"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Não foi possível carregar os livros.</p></div>`;
+        } finally {
+            loadingSpinner.classList.add('hidden');
+        }
+    }
+
+    async function renderMyBooks() {
+        if (!currentUser) return;
+        myBooksContainer.innerHTML = `<div class="col-span-full flex justify-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-[var(--primary)]"></i></div>`;
+        try {
+            const myBooks = await apiFetch('/my-books');
+            myBooksContainer.innerHTML = '';
+            if (myBooks.length === 0) {
+                myBooksContainer.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500"><p>Você ainda não adicionou nenhum livro.</p></div>`;
+            } else {
+                myBooks.forEach(book => myBooksContainer.appendChild(createBookCard(book)));
+            }
+        } catch (error) { console.error("Erro ao carregar meus livros:", error); }
+    }
+
+    function createBookCard(book) {
+        const bookCard = document.createElement('div');
+        bookCard.className = 'book-card bg-white rounded-xl shadow-md overflow-hidden transition flex flex-col cursor-pointer';
+        bookCard.dataset.id = book.id;
+        bookCard.style.transition = 'opacity 0.5s';
+        bookCard.style.opacity = '0';
+        const coverUrl = book.cover_image ? `${BASE_URL}/${book.cover_image}` : null;
+        const statusBadge = book.available ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Disponível</span>' : '<span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">Emprestado</span>';
+        const imageContainer = document.createElement('div');
+        imageContainer.className = "h-48 flex items-center justify-center p-4 bg-gray-50";
+        const detailsContainer = document.createElement('div');
+        detailsContainer.className = "p-4 flex flex-col flex-grow";
+        detailsContainer.innerHTML = `
+            <div class="flex justify-between items-start mb-2"> <h3 class="text-lg font-bold text-gray-800 truncate pr-2">${book.title}</h3> ${statusBadge} </div>
+            <div class="flex justify-between items-center mb-2"> <p class="text-gray-600 text-sm">${book.author}</p> ${book.category ? `<span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">${book.category}</span>` : ''} </div>
+            <p class="text-gray-500 text-xs mb-4 line-clamp-2 flex-grow">${book.description || 'Nenhuma descrição fornecida.'}</p>
+            <div class="flex justify-between items-center text-sm mt-auto pt-2 border-t border-gray-100">
+                <div class="flex items-center text-gray-600">
+                    <i class="fas fa-user-circle mr-1"></i>
+                    <button class="owner-link hover:underline" data-username="${book.owner}">${book.owner}</button>
+                </div>
+            </div>`;
+        if (coverUrl) {
+            const img = new Image();
+            img.src = coverUrl;
+            img.className = "max-h-full max-w-full object-contain";
+            img.alt = `Capa de ${book.title}`;
+            img.onload = () => { imageContainer.innerHTML = ''; imageContainer.appendChild(img); };
+            img.onerror = () => { imageContainer.innerHTML = `<i class="fas fa-book-dead text-4xl text-gray-300"></i>`; };
+        } else { imageContainer.innerHTML = `<i class="fas fa-book text-4xl text-gray-300"></i>`; }
+        bookCard.appendChild(imageContainer);
+        bookCard.appendChild(detailsContainer);
+        setTimeout(() => { bookCard.style.opacity = '1'; }, 50);
+        return bookCard;
+    }
+
+    async function fetchAndRenderLoanDashboard() {
+        if (!currentUser) return;
+        const container = document.getElementById('dashboard-content');
+        container.innerHTML = `<div class="flex justify-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-[var(--primary)]"></i></div>`;
+        try {
+            loans = await apiFetch('/loans/dashboard');
+            container.innerHTML = `
+                <div class="mb-12"><h3 class="text-2xl font-semibold text-[var(--dark)] mb-4 border-b-2 border-[var(--secondary)] pb-2">Meus Pedidos de Empréstimo</h3><div id="my-requests-container" class="space-y-4"></div></div>
+                <div><h3 class="text-2xl font-semibold text-[var(--dark)] mb-4 border-b-2 border-[var(--secondary)] pb-2">Pedidos Recebidos para Meus Livros</h3><div id="received-requests-container" class="space-y-4"></div></div>
+            `;
+            document.getElementById('my-requests-container').innerHTML = loans.my_requests.length ? loans.my_requests.map(loan => createLoanCard(loan, 'my_request')).join('') : '<p class="text-gray-500">Você não solicitou nenhum livro.</p>';
+            document.getElementById('received-requests-container').innerHTML = loans.received_requests.length ? loans.received_requests.map(loan => createLoanCard(loan, 'received_request')).join('') : '<p class="text-gray-500">Você não recebeu nenhum pedido.</p>';
+        } catch (error) { console.error("Erro ao carregar painel:", error); }
+    }
+
+    function createLoanCard(loan, type) {
+        const coverUrl = loan.cover_image ? `${BASE_URL}/${loan.cover_image}` : 'https://illustrations.popsy.co/amber/book-lover.svg';
+        const isPending = loan.status === 'pending';
+        let statusClass, statusText;
+        let newIndicator = type === 'my_request' && !loan.requester_seen && (loan.status === 'approved' || loan.status === 'denied') ? `<span class="ml-2 text-xs font-bold text-white bg-red-500 px-2 py-0.5 rounded-full">Novo</span>` : '';
+        switch(loan.status) {
+            case 'pending': statusClass = 'bg-yellow-100 text-yellow-800'; statusText = 'Pendente'; break;
+            case 'approved': statusClass = 'bg-green-100 text-green-800'; statusText = 'Aprovado'; break;
+            case 'denied': statusClass = 'bg-red-100 text-red-800'; statusText = 'Negado'; break;
+            case 'returned': statusClass = 'bg-gray-200 text-gray-800'; statusText = 'Devolvido'; break;
+        }
+        const buttons = {
+            my_request: ``,
+            received_request: isPending ?
+                `<button data-action="approve" data-loan-id="${loan.id}" class="loan-action-btn bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded">Aprovar</button>
+                 <button data-action="deny" data-loan-id="${loan.id}" class="loan-action-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded">Negar</button>`
+                : (loan.status === 'approved' ? `<button data-action="return" data-loan-id="${loan.id}" class="loan-action-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded">Registrar Devolução</button>`: '')
+        };
+        const loanPeriod = loan.start_date && loan.end_date ? `<p class="text-xs text-gray-500 mt-1"><i class="fas fa-calendar-alt mr-1"></i> ${formatDate(loan.start_date)} à ${formatDate(loan.end_date)}</p>` : '';
+        return `<div class="bg-white p-4 rounded-lg shadow-md flex items-center justify-between flex-wrap gap-2"><div class="flex items-center"><img src="${coverUrl}" class="w-12 h-16 object-cover rounded-md mr-4"><div><h4 class="font-bold text-lg">${loan.title}</h4><p class="text-sm text-gray-600">${type === 'my_request' ? `Dono(a): ${loan.owner_name}` : `Pedido de: ${loan.requester_name}`}</p>${loanPeriod}</div></div><div class="flex items-center space-x-4"><span class="text-sm font-medium px-3 py-1 rounded-full ${statusClass}">${statusText} ${newIndicator}</span><div class="flex space-x-2">${buttons[type]}</div></div></div>`;
+    }
+
+    function renderUserProfile(username) {
+        const profileTitle = document.getElementById('profile-title');
+        const profileBooksContainer = document.getElementById('profile-books-container');
+        profileTitle.innerHTML = `<i class="fas fa-user mr-2 text-[var(--primary)]"></i> Livros de ${username}`;
+        profileBooksContainer.innerHTML = `<div class="col-span-full flex justify-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-[var(--primary)]"></i></div>`;
+        const userBooks = books.filter(book => book.owner === username);
+        if (userBooks.length === 0) {
+            profileBooksContainer.innerHTML = `<p class="col-span-full text-gray-500">Este usuário não compartilhou nenhum livro ainda.</p>`;
+        } else {
+            profileBooksContainer.innerHTML = '';
+            userBooks.forEach(book => profileBooksContainer.appendChild(createBookCard(book)));
+        }
+        navigateTo('user-profile');
+    }
+
+    function prepareFormForAdd() {
+        document.getElementById('form-title').innerHTML = `<i class="fas fa-plus-circle mr-2 text-[var(--secondary)]"></i> Adicionar Novo Livro`;
+        bookForm.reset();
+        document.getElementById('book-id').value = '';
+        navigateTo('add-book');
+    }
+
+    function populateFormForEdit(book) {
+        document.getElementById('form-title').innerHTML = `<i class="fas fa-edit mr-2 text-[var(--secondary)]"></i> Editar Livro`;
+        bookForm.reset();
+        document.getElementById('book-id').value = book.id;
+        document.getElementById('title').value = book.title;
+        document.getElementById('author').value = book.author;
+        document.getElementById('category').value = book.category;
+        document.getElementById('description').value = book.description || '';
+        bookModal.classList.add('hidden');
+        navigateTo('add-book');
+    }
+
+    async function handleBookFormSubmit(e) {
+        e.preventDefault();
+        const bookId = document.getElementById('book-id').value;
+        const formData = new FormData(bookForm);
+        const isEditing = !!bookId;
+        const endpoint = isEditing ? `/books/${bookId}/update` : '/books';
+        try {
+            await apiFetch(endpoint, { method: 'POST', body: formData });
+            showToast(`Livro ${isEditing ? 'atualizado' : 'adicionado'} com sucesso!`);
+            bookForm.reset();
+            await renderBooks();
+            navigateTo('my-books');
+            await renderMyBooks();
+        } catch (error) { console.error(`Falha ao ${isEditing ? 'atualizar' : 'adicionar'} livro:`, error); }
+    }
+
+    async function openBookModal(bookId) {
+        const book = books.find(b => b.id === bookId);
+        if (!book) { showToast('Livro não encontrado.', 'error'); return; }
+        const modalContent = document.getElementById('modal-content');
+        const loanFormContainer = document.getElementById('loan-form-container');
+        document.getElementById('modal-title').textContent = book.title;
+        let contentHTML = `<p><span class="font-medium">Autor:</span> ${book.author}</p><p><span class="font-medium">Dono:</span> ${book.owner}</p>${book.category ? `<p><span class="font-medium">Categoria:</span> <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">${book.category}</span></p>` : ''}<p class="text-gray-600 mt-2">${book.description || 'Nenhuma descrição.'}</p>`;
+        const isOwner = book.owner === currentUser;
+        loanFormContainer.classList.add('hidden');
+        if (isOwner) {
+            contentHTML += `<div class="border-t pt-4 mt-4 flex space-x-2"><button data-action="edit" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg w-full">Editar</button><button data-action="delete" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg w-full">Remover</button></div>`;
+        } else if (currentUser) {
+            if (book.available) {
+                loanFormContainer.classList.remove('hidden');
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('start-date').setAttribute('min', today);
+                document.getElementById('end-date').setAttribute('min', today);
+            } else {
+                contentHTML += `<div class="border-t pt-4 mt-4 text-center text-gray-600 font-medium p-2 bg-yellow-100 rounded-lg">Este livro já está emprestado.</div>`;
+            }
+        } else {
+            contentHTML += `<div class="border-t pt-4 mt-4 text-center text-gray-600">Faça login para solicitar este livro.</div>`;
+        }
+        modalContent.innerHTML = contentHTML;
+        modalContent.querySelector('button[data-action="edit"]')?.addEventListener('click', () => populateFormForEdit(book));
+        modalContent.querySelector('button[data-action="delete"]')?.addEventListener('click', () => deleteBook(book.id));
+        const confirmRequestBtn = document.getElementById('confirm-request-btn');
+        const newConfirmBtn = confirmRequestBtn.cloneNode(true);
+        confirmRequestBtn.parentNode.replaceChild(newConfirmBtn, confirmRequestBtn);
+        newConfirmBtn.addEventListener('click', () => handleRequestLoan(book.id));
+        bookModal.classList.remove('hidden');
+    }
+
+    async function deleteBook(bookId) {
+        if(!confirm('Tem certeza que deseja remover este livro?')) return;
+        try {
+            await apiFetch(`/books/${bookId}`, {method: 'DELETE'});
+            showToast('Livro removido com sucesso!');
+            bookModal.classList.add('hidden');
+            await renderBooks();
+            await renderMyBooks();
+        } catch(e) { console.error('Falha ao remover livro:', e); }
+    }
+
+    async function handleRequestLoan(bookId) {
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+        if (!startDate || !endDate) { showToast('Por favor, selecione as datas de início e fim.', 'error'); return; }
+        if (new Date(endDate) < new Date(startDate)) { showToast('A data de fim não pode ser anterior à data de início.', 'error'); return; }
+        try {
+            const data = await apiFetch(`/books/${bookId}/request`, { method: 'POST', body: { start_date: startDate, end_date: endDate } });
+            showToast(data.message);
+            bookModal.classList.add('hidden');
+            await checkLogin();
+        } catch(error) { console.error('Falha ao solicitar empréstimo:', error); }
+    }
+
+    async function handleLoanAction(e) {
+        const target = e.target.closest('.loan-action-btn');
+        if (!target) return;
+        const { loanId, action } = target.dataset;
+        if (!confirm(`Confirmar ação: ${action}?`)) return;
+        try {
+            const data = await apiFetch(`/loans/${loanId}/${action}`, { method: 'POST' });
+            showToast(data.message);
+            await fetchAndRenderLoanDashboard();
+            await renderBooks();
+            await checkLogin();
+        } catch (error) { console.error('Falha na ação de empréstimo:', error); }
+    }
+
+    async function markNotificationsAsSeen() {
+        const badge = document.getElementById('notification-badge');
+        if (badge && !badge.classList.contains('hidden')) {
+            try {
+                await apiFetch('/loans/mark-seen', { method: 'POST' });
+                await checkLogin();
+            } catch (error) {
+                console.error('Falha ao marcar notificações como vistas:', error);
+            }
+        }
+    }
+
+    function showToast(message, type = 'success') {
+        const toastMessage = document.getElementById('toast-message');
+        const successToast = document.getElementById('success-toast');
+        toastMessage.textContent = message;
+        successToast.className = `fixed bottom-4 right-4 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 transform transition-transform duration-300 z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+        successToast.classList.remove('translate-y-24');
+        setTimeout(() => { successToast.classList.add('translate-y-24'); }, 3000);
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+    }
+
+    // --- EVENT LISTENERS ---
+    const debouncedRenderBooks = debounce(() => renderBooks(), 300);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        populateCategoryDropdowns();
+        await checkLogin();
+        await renderBooks();
+        navigateTo('home');
+    });
+
+    document.querySelector('body').addEventListener('click', (e) => {
+        const navLink = e.target.closest('.nav-link, .nav-link-mobile');
+        if (navLink) {
+            e.preventDefault();
+            mobileMenu.classList.add('hidden'); // Fecha o menu mobile se estiver aberto
+            const pageId = navLink.getAttribute('href').substring(1);
+            if (pageId === 'add-book') {
+                prepareFormForAdd();
+            } else {
+                navigateTo(pageId);
+            }
+            if(pageId === 'loans-dashboard') {
+                markNotificationsAsSeen();
+                fetchAndRenderLoanDashboard();
+            }
+            if(pageId === 'my-books') renderMyBooks();
+        }
+
+        const ownerLink = e.target.closest('.owner-link');
+        if (ownerLink) {
+            e.stopPropagation();
+            const username = ownerLink.dataset.username;
+            if (username) renderUserProfile(username);
+        }
+
+        const bookCard = e.target.closest('.book-card');
+        if (bookCard && !e.target.closest('.owner-link')) {
+            const bookId = parseInt(bookCard.dataset.id, 10);
+            if(bookId) openBookModal(bookId);
+        }
+    });
+
+    document.getElementById('loans-dashboard').addEventListener('click', handleLoanAction);
+    loginBtn.addEventListener('click', () => loginModal.classList.remove('hidden'));
+    heroLoginBtn.addEventListener('click', () => loginModal.classList.remove('hidden'));
+    closeLoginModal.addEventListener('click', () => loginModal.classList.add('hidden'));
+    closeModalBtn.addEventListener('click', () => bookModal.classList.add('hidden'));
+    loginForm.addEventListener('submit', handleLogin);
+    registerForm.addEventListener('submit', handleRegister);
+    bookForm.addEventListener('submit', handleBookFormSubmit);
+    logoutBtn.addEventListener('click', logout);
+    mobileLogoutBtn.addEventListener('click', logout);
+    filterSelect.addEventListener('change', renderBooks);
+    categoryFilterSelect.addEventListener('change', renderBooks);
+    searchBar.addEventListener('input', debouncedRenderBooks);
+    loginTab.addEventListener('click', () => switchTab('login'));
+    registerTab.addEventListener('click', () => switchTab('register'));
+    logoContainer.addEventListener('click', () => {
+        navigateTo('home');
+        renderBooks();
+    });
+    notificationBell.addEventListener('click', (e) => {
+        e.preventDefault();
+        markNotificationsAsSeen();
+        navigateTo('loans-dashboard');
+        fetchAndRenderLoanDashboard();
+    });
+    mobileNotificationBell.addEventListener('click', (e) => {
+        e.preventDefault();
+        markNotificationsAsSeen();
+        navigateTo('loans-dashboard');
+        fetchAndRenderLoanDashboard();
+    });
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    </script>
+</body>
+</html>
