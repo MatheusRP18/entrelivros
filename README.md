@@ -1,54 +1,63 @@
-# 📖 EntreLivros
-
-### _Sua biblioteca pessoal, compartilhada entre amigos._
-
-<br>
-
-![Status do Projeto](https://img.shields.io/badge/status-conclu%C3%ADdo-brightgreen)
-
-Bem-vindo ao **EntreLivros**! Este projeto nasceu da ideia de criar uma forma simples e divertida para amigos compartilharem seus livros. Chega de livros acumulando poeira na estante! Com esta aplicação, você pode catalogar sua coleção, descobrir o que seus amigos estão lendo e gerenciar empréstimos de forma organizada.
+# 📖 EntreLivros: Sistema de Gerenciamento de Empréstimos
 
 ---
 
-### 🖼️ Demonstração Visual
+### Contexto do Projeto
+
+Este projeto foi desenvolvido como **Projeto Aplicado Prático (PAPR)** para o curso de **Análise e Desenvolvimento de Sistemas**.
+
+* **Instituição:** UNIASSELVI
+* **Autor:** [Matheus da Rosa Paes]
+
+<br>
+
+**➡️ [Acesse a demonstração ao vivo aqui!](https://bit.ly/entrelivrosrp)**
 
 ![Placeholder para a imagem da aplicação](https://i.imgur.com/RfbcJoP.png)
+
+---
+
+### Sobre o Projeto
+
+O **EntreLivros** é uma aplicação web full-stack desenvolvida para solucionar o problema de gerenciamento de empréstimos de livros entre amigos e pequenas comunidades. O objetivo é criar uma plataforma centralizada onde os usuários podem catalogar seus acervos, visualizar os livros de outros membros e administrar um sistema de solicitações de empréstimo de forma organizada e intuitiva.
+
+A aplicação foi construída do zero, abrangendo desde a modelagem do banco de dados e desenvolvimento do backend com lógica de negócios, até a criação de uma interface de usuário interativa no frontend.
 
 ---
 
 ### ✨ Funcionalidades Principais
 
 * 👤 **Autenticação de Usuários:** Sistema completo de registro e login.
-* 📚 **Gerenciamento de Livros:** CRUD completo (Adicionar, Ler, Atualizar e Deletar) para os livros do seu acervo pessoal.
-* 🖼️ **Upload de Imagens:** Adicione uma capa para cada livro para deixar sua estante mais bonita.
-* 🏷️ **Categorias e Filtros:** Organize e encontre livros por categoria (Ficção, Romance, etc.) e status (Disponível, Emprestado).
-* 🔍 **Barra de Busca:** Pesquise livros em tempo real por título ou autor.
-* 🤝 **Sistema de Empréstimos:** Um fluxo completo para solicitar, aprovar, negar e registrar a devolução de livros.
-* 📊 **Painel Pessoal:** Uma área para gerenciar os empréstimos que você fez e os pedidos que recebeu.
-* 👤 **Páginas de Perfil:** Visite o perfil de outros usuários para ver a coleção deles.
-* 📱 **Design Responsivo:** Funciona bem tanto no computador quanto no celular.
+* 📚 **Gerenciamento de Livros:** CRUD completo (Adicionar, Ler, Atualizar e Deletar) para os livros do acervo pessoal.
+* 🖼️ **Upload de Imagens:** Adição de capas para cada livro.
+* 🏷️ **Sistema de Categorias e Filtros:** Organização e busca por categoria e status (Disponível/Emprestado).
+* 🔍 **Barra de Busca:** Pesquisa em tempo real por título ou autor.
+* 🤝 **Sistema de Solicitação de Empréstimos:** Fluxo completo para solicitar, aprovar, negar e registrar a devolução de livros.
+* 📊 **Painel Pessoal:** Área para gerenciar os empréstimos feitos e os pedidos recebidos.
+* 👤 **Páginas de Perfil:** Visualização da coleção de outros usuários.
+* 📱 **Design Responsivo:** Interface adaptável para computadores e celulares.
 
 ---
 
 ### 🚀 Tecnologias Utilizadas
 
-Este projeto foi construído do zero com as seguintes tecnologias:
+Este projeto demonstra a aplicação prática das seguintes tecnologias:
 
 * **Backend:**
-    * **Python 3**
-    * **Flask:** Um micro-framework leve e poderoso para criar a API.
-    * **SQLite3:** Um banco de dados simples e baseado em arquivo, perfeito para projetos como este.
+    * **Python 3:** Linguagem principal para toda a lógica do servidor.
+    * **Flask:** Micro-framework utilizado para construir a API RESTful que serve o frontend.
+    * **SQLite3:** Banco de dados relacional baseado em arquivo para persistência de dados.
 
 * **Frontend:**
-    * **HTML5**
-    * **CSS3** com **Tailwind CSS:** Para uma estilização rápida e moderna.
-    * **JavaScript (Vanilla):** Todo o dinamismo da página foi construído com JavaScript puro, sem frameworks, para gerenciar a interação com o usuário e a comunicação com o backend.
+    * **HTML5:** Estruturação do conteúdo da aplicação.
+    * **CSS3** com **Tailwind CSS:** Para uma estilização rápida, moderna e responsiva.
+    * **JavaScript (Vanilla):** Utilizado para criar toda a dinamicidade da interface (SPA - Single Page Application), manipular o DOM e se comunicar com a API do backend.
 
 ---
 
 ### ⚙️ Como Rodar o Projeto Localmente
 
-Para rodar este projeto na sua própria máquina, siga os passos:
+Para executar e testar a aplicação em um ambiente de desenvolvimento:
 
 1.  **Clone o repositório:**
     ```bash
@@ -76,12 +85,12 @@ Para rodar este projeto na sua própria máquina, siga os passos:
     pip install -r requirements.txt
     ```
 
-5.  **Crie o banco de dados inicial:**
+5.  **Crie a estrutura inicial do banco de dados:**
     ```bash
     python database.py
     ```
 
-6.  **Rode a aplicação:**
+6.  **Execute o servidor Flask:**
     ```bash
     python app.py
     ```
@@ -90,13 +99,4 @@ Para rodar este projeto na sua própria máquina, siga os passos:
 
 ---
 
-### 💡 Planos Futuros e Melhorias
-
-Algumas ideias para evoluir o projeto:
-
-* [ ] Sistema de avaliação com estrelas para os livros.
-* [ ] Notificações no site para novos pedidos de empréstimo.
-* [ ] Uma página de "Favoritos" ou "Lista de Desejos".
-
----
-
+Feito como parte da jornada de aprendizado em Análise e Desenvolvimento de Sistemas.
