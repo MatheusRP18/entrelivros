@@ -7,7 +7,7 @@
 Este projeto foi desenvolvido como **Projeto Aplicado Prático (PAPR)** para o curso de **Análise e Desenvolvimento de Sistemas**.
 
 * **Instituição:** UNIASSELVI
-* **Autor:** [Matheus da Rosa Paes]
+* **Autor:** Matheus da Rosa Paes
 
 <br>
 
